@@ -131,6 +131,25 @@
    We want to break this table up into multiple tables. First of all create a `customers` table to hold the customer name data and an `email_addresses` table to hold the customer email data. Create a one-to-one relationship between them, ensuring that if a customer record is deleted so is the equivalent email address record. Populate the tables with the appropriate data from the current `orders` table.
 
    ```sql
+   CREATE TABLE customers (
+   	id serial PRIMARY KEY,
+       customer_name varchar(100)
+   );
+   
+   CREATE TABLE email_addresses (
+       customer_id int PRIMARY KEY,
+       customer_email varchar(50),
+       FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+   );
+   
+   INSERT INTO customers (customer_name)
+   	VALUES ('James Bergman'),
+   		   ('Natasha O''Shea'),
+   		   ('Aaron Muller');
+   		   
+   INSERT INTO email_addresses (customer_id, customer_email)
+   	VALUES (1, 'james1998@email.com'),
+   		   (2, 'natasha@osheafamily.com');
    ```
 
    
@@ -153,7 +172,30 @@
 
    The table should also have an auto-incrementing `id` column which acts as its `PRIMARY KEY`. The `product_type` column should hold strings of up to 20 characters. Other than that, the column types should be the same as their equivalent columns from the `orders` table.
 
-   Solution
+   ```sql
+   CREATE TABLE products (
+   	id serial PRIMARY KEY,
+       product_name varchar(50),
+       product_cost decimal(4,2),
+       product_type varchar(20),
+       product_loyalty_points integer
+   );
+   
+   INSERT INTO products (product_name, product_cost, product_type, product_loyalty_points)
+   	VALUES ('LS Burger', 3.00, 'Burger', 10),
+   		   ('LS Cheeseburger', 3.50, 'Burger', 15),
+   		   ('LS Chicken Burger', 4.50, 'Burger', 20),
+   		   ('LS Double Deluxe Burger', 6.00, 'Burger', 30),
+   		   ('Fries', 1.20, 'Side', 3),
+   		   ('Onion Rings', 1.50, 'Side', 5),
+   		   ('Cola', 1.50, 'Drink', 5),
+   		   ('Lemonade', 1.50, 'Drink', 5),
+   		   ('Vanilla Shake', 2.00, 'Drink', 7),
+   		   ('Chocolate Shake', 2.00, 'Drink', 7),
+   		   ('Strawberry Shake', 2.00, 'Drink', 7);
+   ```
+
+   
 
 6. To associate customers with products, we need to do two more things:
 
@@ -170,4 +212,48 @@
 
    Assume that the `order_status` field of the `orders` table can hold strings of up to 20 characters.
 
-   Solution
+   ```sql
+   DROP TABLE orders;
+   
+   CREATE TABLE orders (
+   	id serial PRIMARY KEY,
+       customer_id integer,
+       order_status varchar(20),
+       FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+   );
+   
+   CREATE TABLE order_items (
+   	id serial PRIMARY KEY,
+       order_id integer,
+       product_id integer,
+       FOREIGN KEY (product_id) REFERENCES products (id),
+       FOREIGN KEY (order_id) REFERENCES orders (id)
+   );
+   
+   INSERT INTO orders (customer_id, order_status)
+   	VALUES (1, 'In Progress'),
+   		   (2, 'Placed'),
+   		   (2, 'Complete'),
+   		   (3, 'Placed');
+   		  
+   INSERT INTO order_items (order_id, product_id)
+   	VALUES (1, 3),
+   		   (1, 5),
+   		   (1, 6),
+   		   (1, 8),
+   		   (2, 2),
+   		   (2, 5),
+   		   (2, 7),
+   		   (3, 4),
+              (3, 2),
+              (3, 5),
+              (3, 5), 
+              (3, 6),
+              (3, 10),
+              (3, 9),
+   		   (4, 1),
+              (4, 5);
+   	
+   ```
+
+   
