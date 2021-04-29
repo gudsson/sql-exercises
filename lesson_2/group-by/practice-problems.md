@@ -146,8 +146,6 @@
 
 11. Write a SQL query that will return the following data:
 
-    
-
     ```psql
        genre   | total_duration
     -----------+----------------
@@ -162,4 +160,11 @@
     (8 rows)
     ```
 
-    Show Solution
+    ```sql
+    SELECT genre, sum(duration) AS total_duration
+    	FROM films
+    	GROUP BY genre
+    	ORDER BY total_duration;
+    ```
+
+    
